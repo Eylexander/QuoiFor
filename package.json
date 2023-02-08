@@ -1,0 +1,20 @@
+{
+  "name": "quoifor",
+  "version": "0.0.1",
+  "description": "Quoi ?",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index"
+  },
+  "keywords": [
+    "quoi"
+  ],
+  "author": "Eylexander",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^8.1.0",
+    "chalk": "^4.1.2",
+    "discord.js": "^14.7.1",
+    "moment": "^2.29.4"
+  }
+}
