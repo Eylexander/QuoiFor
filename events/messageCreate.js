@@ -30,20 +30,8 @@ module.exports = async (client, message) => {
         cnt.prepare("INSERT INTO counter VALUES (@id, @tag, @number);").run(count);
     }
 
-    let getTriggers = trig.prepare("SELECT trigger FROM triggers;").all();
-    let getGifs = data.prepare("SELECT quoi FROM data;").all();
-
-    let triggers = getTriggers.map(x => x.trigger);
-    let gifs = getGifs.map(x => x.quoi);
-
-    if (triggers.includes(message.content.toLowerCase())) {
-        count.number++;
-        cnt.prepare("UPDATE counter SET number = @number WHERE id = @id;").run(count);
-        return message.reply({
-            content: gifs[Math.floor(Math.random() * gifs.length)],
-            allowedMentions: { repliedUser: false }
-        })
-    }
+    let triggers = trig.prepare("SELECT trigger FROM triggers;").all().map(x => x.trigger);
+    let gifs = data.prepare("SELECT quoi FROM data;").all().map(x => x.quoi);
 
     if (message.content.startsWith("<@" + client.user.id + ">")) {
 
@@ -131,6 +119,11 @@ module.exports = async (client, message) => {
                     allowedMentions: { repliedUser: false }
                 });
 
+                if (gifs.includes(args[1])) return message.reply({
+                    content: `Le gif est déjà dans la liste !`,
+                    allowedMentions: { repliedUser: false }
+                });
+
                 data.prepare(`INSERT INTO data (quoi) VALUES ('${args[1]}');`).run();
                 message.reply({
                     content: `Le gif "${args[1]}" a été ajouté !`,
@@ -148,6 +141,10 @@ module.exports = async (client, message) => {
                     content: `Le lien ou l'id n'est pas valide !`,
                     allowedMentions: { repliedUser: false }
                 });
+
+                let getQuoi = data.prepare("SELECT id FROM data;").all().map(x => x.id);
+
+                if (!gifs.includes(args[1]) || !getQuoi.includes(args[1])) return;
 
                 data.prepare(`DELETE FROM data WHERE quoi = '${args[1]}' OR id = '${args[1]}';`).run();
                 message.reply({
@@ -185,6 +182,11 @@ module.exports = async (client, message) => {
 
                 if (args.length < 2) return;
 
+                if (triggers.includes(args[1])) return message.reply({
+                    content: `Le trigger existe déjà !`,
+                    allowedMentions: { repliedUser: false }
+                });
+
                 trig.prepare(`INSERT INTO triggers (trigger) VALUES ('${args[1]}');`).run();
 
                 message.reply({
@@ -201,7 +203,11 @@ module.exports = async (client, message) => {
 
                 if (args.length < 2) return;
 
-                trig.prepare(`DELETE FROM triggers WHERE trigger = '${args[1]}';`).run();
+                let getTrig = trig.prepare("SELECT id FROM triggers;").all().map(t => t.id);
+
+                if (!triggers.includes(args[1]) || !getTrig.includes(args[1])) return;
+
+                trig.prepare(`DELETE FROM triggers WHERE trigger = '${args[1]}' OR id = '${args[1]}';`).run();
 
                 message.reply({
                     content: `Le trigger "${args[1]}" a été supprimé !`,
@@ -239,6 +245,18 @@ module.exports = async (client, message) => {
                     allowedMentions: { repliedUser: false }
                 })
                 break;
+        }
+    } else {
+        for (const trigger of triggers) {
+            if (message.content.toLowerCase().includes(trigger)) {
+                count.number++;
+                cnt.prepare("UPDATE counter SET number = @number WHERE id = @id;").run(count);
+                message.reply({
+                    content: gifs[Math.floor(Math.random() * gifs.length)],
+                    allowedMentions: { repliedUser: false }
+                })
+                break;
+            }
         }
     }
 
