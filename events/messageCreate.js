@@ -104,7 +104,7 @@ module.exports = async (client, message) => {
 
             case "invite":
                 message.reply({
-                    content: `Voici le lien d'invitation du bot : \nhttps://discord.com/api/oauth2/authorize?client_id=1072888923438727240&permissions=76800&scope=bot`,
+                    content: `Voici le lien d'invitation du bot : \nhttps://discord.com/api/oauth2/authorize?client_id=1072888923438727240&permissions=535261211712&scope=bot`,
                     allowedMentions: { repliedUser: false }
                 })
                 break;
